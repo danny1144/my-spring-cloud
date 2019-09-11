@@ -26,7 +26,6 @@ import java.lang.reflect.Method;
 @Component
 public class ResubmitDataAspect {
 
-    private final static String DATA = "data";
     private final static Object PRESENT = new Object();
 
     @Around("@annotation(com.tz.lock.Resubmit)")
