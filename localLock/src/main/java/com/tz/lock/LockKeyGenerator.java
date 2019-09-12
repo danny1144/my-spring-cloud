@@ -20,7 +20,7 @@ public class LockKeyGenerator implements CacheKeyGenerator {
         final Object[] args = pjp.getArgs();
         final Parameter[] parameters = method.getParameters();
         StringBuilder builder = new StringBuilder();
-        // TODO 默认解析方法里面带 CacheParam 注解的属性,如果没有尝试着解析实体对象中的
+        // TODO 默认解析方法里面带 CacheParam 注解的属性,如果没有尝试着解析实体对象中的属性是否带有CacheParam注解
         for (int i = 0; i < parameters.length; i++) {
             final CacheParam annotation = parameters[i].getAnnotation(CacheParam.class);
             if (annotation == null) {

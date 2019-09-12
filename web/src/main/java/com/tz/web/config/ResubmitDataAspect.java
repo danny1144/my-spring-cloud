@@ -16,10 +16,7 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 
 /**
- * @ClassName RequestDataAspect
  * @Description 数据重复提交校验
- * @Author lijing
- * @Date 2019/05/16 17:05
  **/
 @Log4j
 @Aspect

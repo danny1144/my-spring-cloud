@@ -16,9 +16,6 @@ import java.util.UUID;
 
 /**
  * redis 方案
- *
- * @author Levin
- * @since 2018/6/12 0012
  */
 @Aspect
 @Configuration
