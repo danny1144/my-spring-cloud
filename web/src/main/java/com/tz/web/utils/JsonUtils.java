@@ -13,15 +13,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * <b>Description:</b> json转换工具类 <br>
- * 
- * @author luozhen
- * @version 1.0
- * @Note <b>ProjectName:</b> MySpringBoot <br>
- *       <b>PackageName:</b> com.luozhen.util <br>
- *       <b>ClassName:</b> JacksonActivity <br>
- *       <b>Date:</b> 2018年5月24日 下午12:50:59
  */
-
 public class JsonUtils {
     
     /**

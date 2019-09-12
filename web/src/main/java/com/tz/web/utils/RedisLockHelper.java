@@ -62,12 +62,13 @@ public class RedisLockHelper {
         final long milliseconds = Expiration.from(timeout, unit).getExpirationTimeInMilliseconds();
         boolean success = stringRedisTemplate.opsForValue().setIfAbsent(lockKey, (System.currentTimeMillis() + milliseconds) + DELIMITER + uuid);
         if (success) {
-            stringRedisTemplate.expire(lockKey, timeout, TimeUnit.SECONDS);
+            //这个过期时间，设置过期时间失效则说明key过期了呀。
+           return  stringRedisTemplate.expire(lockKey, timeout, TimeUnit.SECONDS);
         } else {
             String oldVal = stringRedisTemplate.opsForValue().getAndSet(lockKey, (System.currentTimeMillis() + milliseconds) + DELIMITER + uuid);
             final String[] oldValues = oldVal.split(Pattern.quote(DELIMITER));
             if (Long.parseLong(oldValues[0]) + 1 <= System.currentTimeMillis()) {
-                return true;
+                    return true;
             }
         }
         return success;
