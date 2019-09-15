@@ -11,6 +11,7 @@
     <modules>
         <module>localLock</module>
         <module>web</module>
+        <module>register</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
