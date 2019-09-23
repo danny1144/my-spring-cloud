@@ -13,6 +13,8 @@
         <module>web</module>
         <module>register</module>
         <module>thread</module>
+        <module>actuator</module>
+        <module>ldapModle</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
