@@ -20,6 +20,7 @@ public class SptingDataLdapConfig {
 		//rootDn用户
 		ldapContextSource.setUserDn("cn=Manager,dc=siemens,dc=com");
 		ldapContextSource.setPassword("123456");
+		ldapContextSource.setReferral("follow");
 		return ldapContextSource;
 	}
  

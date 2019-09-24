@@ -17,12 +17,32 @@ public class LdapController {
      * @return
      * @throws Exception
      */
+    @RequestMapping("connection")
+    public  Object connection(){
+
+        return  ldapService.connection();
+    }
+
+    /**
+     * 认证用户名和密码
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("authentic")
+    public  Object authentic(String userName,String password){
+
+        return  ldapService.authentic(userName,password);
+    }
+    /**
+     * 添加用户
+     * @return
+     * @throws Exception
+     */
     @RequestMapping("addUser")
     public  Object addUser() throws Exception {
         ldapService.addUser();
         return "success";
     }
-
     /**
      * 添加用户组并添加用户至用户组
      * @return

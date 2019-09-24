@@ -3,8 +3,6 @@ package com.tz.ldap.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.ldap.core.support.LdapContextSource;
-import org.springframework.ldap.core.support.SingleContextSource;
 import org.springframework.stereotype.Service;
 
 import javax.naming.directory.BasicAttribute;
@@ -20,6 +18,22 @@ public class LdapService {
     @Autowired
     private  LdapTemplate ldapTemplate;
 
+
+
+
+    /**
+     * 测试连接
+     * @throws Exception
+     */
+    public boolean connection()   {
+
+        try {
+            return null != ldapTemplate.lookup("");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     /**
      * 添加用户
      * @throws Exception
@@ -93,4 +107,11 @@ public class LdapService {
     }
 
 
+    public boolean authentic(String userName, String password) {
+
+        String filter = "(&(objectClass=inetOrgPerson)(uid="+userName+"))";
+        //用于认证的LdapTemplate不能用SingleContext生成，否则会认证失败
+        return ldapTemplate.authenticate("", filter, password );
+
+    }
 }
