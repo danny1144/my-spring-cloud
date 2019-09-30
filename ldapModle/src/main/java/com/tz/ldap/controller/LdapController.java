@@ -1,5 +1,7 @@
 package com.tz.ldap.controller;
 
+import com.tz.ldap.dao.UserRepository;
+import com.tz.ldap.pojo.LdapUsers;
 import com.tz.ldap.service.LdapService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,6 +13,12 @@ public class LdapController {
 
     @Resource
     private LdapService ldapService;
+
+
+    @Resource
+    private UserRepository userRepository;
+
+
 
     /**
      * 添加用户
@@ -52,5 +60,17 @@ public class LdapController {
     public  Object addUserGroup() throws Exception {
         ldapService.addUserGroup();
         return "success";
+    }
+
+
+    /**
+     * 添加用户组并添加用户至用户组
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("findAll")
+    public  Object findAll() throws Exception {
+        Iterable<LdapUsers> all = userRepository.findAll();
+        return all;
     }
 }
