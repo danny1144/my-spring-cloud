@@ -3,6 +3,7 @@ package com.tz.ldap.controller;
 import com.tz.ldap.dao.UserRepository;
 import com.tz.ldap.pojo.LdapUsers;
 import com.tz.ldap.service.LdapService;
+import com.tz.ldap.util.ResponseMessage;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -60,7 +61,7 @@ public class LdapController {
     @RequestMapping("addUserGroup")
     public  Object addUserGroup() throws Exception {
         ldapService.addUserGroup();
-        return "success";
+        return ResponseMessage.okWithoutRes("添加用户组成功");
     }
 
 
@@ -72,7 +73,7 @@ public class LdapController {
     @RequestMapping("findAll")
     public  Object findAll() throws Exception {
         Iterable<LdapUsers> all = userRepository.findAll();
-        return all;
+        return ResponseMessage.okWithoutMsg(all);
     }
 
 
@@ -84,6 +85,6 @@ public class LdapController {
     @RequestMapping("testAll")
     public  Object testAll() {
         List all = ldapService.testAll();
-        return all;
+        return ResponseMessage.okWithoutMsg(all);
     }
 }
