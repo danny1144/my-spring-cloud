@@ -8,7 +8,6 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>ldapModle</artifactId>
     <dependencies>
         <dependency>
@@ -20,5 +19,159 @@
             <artifactId>unboundid-ldapsdk</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>db2fs</groupId>
+            <artifactId>db2fs</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/db2fs.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>db2jcc_javax</groupId>
+            <artifactId>db2jcc_javax</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/db2jcc_javax.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>db2jcc_license_cisuz</groupId>
+            <artifactId>db2jcc_license_cisuz</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/db2jcc_license_cisuz.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>db2jcc_license_cu</groupId>
+            <artifactId>db2jcc_license_cu</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/db2jcc_license_cu.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>db2policy</groupId>
+            <artifactId>db2policy</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/db2policy.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>db2qgjava</groupId>
+            <artifactId>db2qgjava</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/db2qgjava.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>portal.ldapV16</groupId>
+            <artifactId>portal.ldapV16</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/portal.ldapV16.jar</systemPath>
+        </dependency>
     </dependencies>
+    <build>
+        <resources>
+            <!--表示把java目录下的有关xml文件,properties文件编译/打包的时候放在resource目录下 -->
+            <resource>
+                <directory>${basedir}/src/main/java</directory>
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+            </resource>
+        </resources>
+    <!--<!–引入本地jar包，就是plugins中的两个plugin（不知道哪个起作用，最好都引入）–> -->
+    <plugins>
+        <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>2.3.2</version>
+            <configuration>
+                <source>1.8</source>
+                <target>1.8</target>
+                <encoding>UTF-8</encoding>
+                <compilerArguments>
+                    <extdirs>src\main\webapp\WEB-INF\lib</extdirs>
+                </compilerArguments>
+            </configuration>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+                <webResources>
+                    <resource>
+                        <directory>${project.basedir}/lib</directory>
+                        <targetPath>WEB-INF/lib</targetPath>
+                        <filtering>true</filtering>
+                        <includes>
+                            <include>**/*.jar</include>
+                        </includes>
+                    </resource>
+                </webResources>
+            </configuration>
+        </plugin>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>appassembler-maven-plugin</artifactId>
+            <version>2.0.0</version>
+            <configuration>
+                <assembleDirectory>target/app</assembleDirectory>
+                <repositoryName>lib</repositoryName>
+                <repositoryLayout>flat</repositoryLayout>
+                <!-- 配置文件的目标目录 -->
+                <configurationDirectory>conf</configurationDirectory>
+                <!-- 拷贝配置文件到上面的目录中 -->
+                <copyConfigurationDirectory>true</copyConfigurationDirectory>
+                <!-- 从哪里拷贝配置文件 (默认src/main/config) -->
+                <configurationSourceDirectory>src/main/resources</configurationSourceDirectory>
+                <filterConfigurationDirectory>true</filterConfigurationDirectory>
+                <useWildcardClassPath>true</useWildcardClassPath>
+                <programs>
+                    <program>
+                        <mainClass>com.tz.ldap.LdapApplication</mainClass>
+                        <name>Application</name>
+                        <jvmSettings>
+                            <extraArguments>
+                                <extraArgument>-Denv="DEV"</extraArgument>
+                                <extraArgument>-server</extraArgument>
+                                <extraArgument>-Xmx512M</extraArgument>
+                                <extraArgument>-Xms512M</extraArgument>
+                            </extraArguments>
+                        </jvmSettings>
+                    </program>
+                </programs>
+            </configuration>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>assemble</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+                <execution>
+                    <id>copy-dependencies</id>
+                    <phase>prepare-package</phase>
+                    <goals>
+                        <goal>copy-dependencies</goal>
+                    </goals>
+                    <configuration>
+                        <outputDirectory>${basedir}/target/app/lib/</outputDirectory>
+                        <overWriteReleases>false</overWriteReleases>
+                        <overWriteSnapshots>false</overWriteSnapshots>
+                        <overWriteIfNewer>true</overWriteIfNewer>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+    </build>
 </project>

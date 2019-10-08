@@ -1,5 +1,6 @@
 package com.tz.ldap.service;
 
+import com.icitic.ldap.UserDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.LdapTemplate;
@@ -17,7 +18,6 @@ public class LdapService {
 
     @Autowired
     private  LdapTemplate ldapTemplate;
-
 
 
 
@@ -113,5 +113,18 @@ public class LdapService {
         //用于认证的LdapTemplate不能用SingleContext生成，否则会认证失败
         return ldapTemplate.authenticate("", filter, password );
 
+    }
+
+
+
+    /**
+     * ldap測試
+     * @throws Exception
+     */
+    public List testAll() {
+
+        UserDAO userDao=new UserDAO();
+        List allUsers = userDao.getAllUsers();
+        return  allUsers;
     }
 }

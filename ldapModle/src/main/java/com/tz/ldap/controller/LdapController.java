@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RestController
 public class LdapController {
@@ -71,6 +72,18 @@ public class LdapController {
     @RequestMapping("findAll")
     public  Object findAll() throws Exception {
         Iterable<LdapUsers> all = userRepository.findAll();
+        return all;
+    }
+
+
+    /**
+     * 測試工具
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("testAll")
+    public  Object testAll() {
+        List all = ldapService.testAll();
         return all;
     }
 }
