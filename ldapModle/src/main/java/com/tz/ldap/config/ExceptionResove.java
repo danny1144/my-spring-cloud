@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * 异常处理
+ */
 @RestControllerAdvice
 @Slf4j
 public class ExceptionResove {
