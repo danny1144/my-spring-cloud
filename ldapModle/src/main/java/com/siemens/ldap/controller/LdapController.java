@@ -24,7 +24,7 @@ public class LdapController {
 
 
     /**
-     * 添加用户
+     * 测试本地连接
      * @return
      * @throws Exception
      */
