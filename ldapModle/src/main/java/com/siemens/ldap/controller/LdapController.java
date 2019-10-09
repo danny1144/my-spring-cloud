@@ -3,6 +3,7 @@ package com.siemens.ldap.controller;
 import com.siemens.ldap.dao.UserRepository;
 import com.siemens.ldap.pojo.LdapUsers;
 import com.siemens.ldap.service.LdapService;
+import com.siemens.ldap.util.LdapUtils;
 import com.siemens.ldap.util.ResponseMessage;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -78,13 +79,35 @@ public class LdapController {
 
 
     /**
-     * 測試工具
+     * 測試工具获取所有用户
      * @return
      * @throws Exception
      */
     @RequestMapping("testAll")
     public  Object testAll() {
         List all = ldapService.testAll();
+        return ResponseMessage.okWithoutMsg(all);
+    }
+
+
+    /**
+     * 測試工具用户是否存在
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping("testUserLogin")
+    public  Object testUserLogin(String cn,String password) {
+        Boolean all = ldapService.login(cn,password);
+        return ResponseMessage.okWithoutMsg(all);
+    }
+
+    /**
+     * ldap測試根据用户id获取用户
+     * @return
+     */
+    @RequestMapping("queryUserByUserID")
+    public  Object queryUserByUserID(String userId ) {
+        Iterable<LdapUtils.UserInfo> all = ldapService.queryUserByUserID(userId);
         return ResponseMessage.okWithoutMsg(all);
     }
 }

@@ -1,6 +1,7 @@
 package com.siemens.ldap.service;
 
 import com.icitic.ldap.UserDAO;
+import com.siemens.ldap.util.LdapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.LdapTemplate;
@@ -22,7 +23,8 @@ public class LdapService {
     @Autowired
     private  UserDAO userDAO;
 
-
+    @Autowired
+    private LdapUtils ldapUtils;
 
     /**
      * 测试连接
@@ -121,11 +123,29 @@ public class LdapService {
 
 
     /**
-     * ldap測試
-     * @throws Exception
+     * ldap測試获取所有用户
      */
     public List testAll() {
         List allUsers = userDAO.getAllUsers();
         return  allUsers;
+    }
+
+
+
+    /**
+     * ldap測試登陆用户是否存在
+      */
+    public Boolean login(String cn, String password) {
+        boolean login = ldapUtils.login(cn, password);
+        return  login;
+    }
+
+
+    /**
+     * ldap測試根据用户id获取用户
+     */
+    public  List<LdapUtils.UserInfo> queryUserByUserID(String userId ) {
+        List<LdapUtils.UserInfo> userInfos = ldapUtils.queryUserByUserID(userId);
+        return  userInfos;
     }
 }

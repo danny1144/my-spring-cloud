@@ -1,6 +1,7 @@
 package com.siemens.ldap.config;
 
 import com.icitic.ldap.UserDAO;
+import com.siemens.ldap.util.LdapUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.ldap.repository.config.EnableLdapRepositories;
@@ -11,7 +12,7 @@ import org.springframework.ldap.core.support.LdapContextSource;
 @Configuration
 @EnableLdapRepositories
 public class SptingDataLdapConfig {
- 
+
 	@Bean
 	ContextSource contextSource() {
  
@@ -35,4 +36,10 @@ public class SptingDataLdapConfig {
 	UserDAO userDAO( ) {
 		return new UserDAO( );
 	}
+
+	@Bean
+	LdapUtils ldapUtils( ) {
+		return new LdapUtils( );
+	}
+
 }

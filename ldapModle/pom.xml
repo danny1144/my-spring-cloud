@@ -131,7 +131,7 @@
                 <useWildcardClassPath>true</useWildcardClassPath>
                 <programs>
                     <program>
-                        <mainClass>com.tz.ldap.LdapApplication</mainClass>
+                        <mainClass>com.siemens.ldap.LdapApplication</mainClass>
                         <name>Application</name>
                         <jvmSettings>
                             <extraArguments>

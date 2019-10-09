@@ -4,11 +4,7 @@ import sun.misc.BASE64Encoder;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -20,19 +16,35 @@ import javax.naming.ldap.InitialLdapContext;
 
 public class LdapUtils {
 
-        private String ldapURL;
+        private   final String ENCRYPT;
+        private   final String LDAPURL;
+        private   final String LDAP_PORT;
+        private   final String LDAP_PROVIDER;
+        private   final String hostname;
+        private   final String adminUid;
+        private   final String adminPassword;
+        private   final String secAuth;
+        private static ResourceBundle rb = ResourceBundle.getBundle("com.icitic.ldap.sys.config");
 
-        public LdapUtils(String host, String port) {
-            this.ldapURL = "ldap://" + host + ":" + port;
+        public LdapUtils() {
+
+            LDAP_PORT = rb.getString("ldapport");
+            LDAP_PROVIDER = rb.getString("ldapprovider");
+            hostname = rb.getString("ldaphost");
+            adminUid = rb.getString("ldapuser");
+            adminPassword = rb.getString("ldapuserpass");
+            secAuth = rb.getString("secauth");
+            ENCRYPT = rb.getString("isEncrypted");
+            LDAPURL = "ldap://" + hostname + ":" + LDAP_PORT;
         }
 
         private InitialLdapContext initLDAPContext() throws NamingException {
             Hashtable env = new Hashtable();
-            env.put("java.naming.provider.url", this.ldapURL);
-            env.put("java.naming.security.authentication", "simple");
-            env.put("java.naming.security.principal", "cn=root");
-            env.put("java.naming.security.credentials", "1qazXSW@");
-            env.put("java.naming.factory.initial", "com.sun.jndi.ldap.LdapCtxFactory");
+            env.put("java.naming.provider.url", this.LDAPURL);
+            env.put("java.naming.security.authentication",secAuth);
+            env.put("java.naming.security.principal", adminUid);
+            env.put("java.naming.security.credentials", adminPassword);
+            env.put("java.naming.factory.initial", LDAP_PROVIDER);
             return new InitialLdapContext(env, (Control[])null);
         }
 
