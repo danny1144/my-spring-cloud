@@ -1,5 +1,6 @@
 package com.tz.ldap.config;
 
+import com.icitic.ldap.UserDAO;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.ldap.repository.config.EnableLdapRepositories;
@@ -27,5 +28,11 @@ public class SptingDataLdapConfig {
 	@Bean
 	LdapTemplate ldapTemplate(ContextSource contextSource) {
 		return new LdapTemplate(contextSource);
+	}
+
+
+	@Bean
+	UserDAO userDAO( ) {
+		return new UserDAO( );
 	}
 }

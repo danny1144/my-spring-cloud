@@ -19,6 +19,9 @@ public class LdapService {
     @Autowired
     private  LdapTemplate ldapTemplate;
 
+    @Autowired
+    private  UserDAO userDAO;
+
 
 
     /**
@@ -122,9 +125,7 @@ public class LdapService {
      * @throws Exception
      */
     public List testAll() {
-
-        UserDAO userDao=new UserDAO();
-        List allUsers = userDao.getAllUsers();
+        List allUsers = userDAO.getAllUsers();
         return  allUsers;
     }
 }
