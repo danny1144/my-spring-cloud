@@ -1,4 +1,4 @@
-package com.tz.ldap.pojo;
+package com.siemens.ldap.pojo;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

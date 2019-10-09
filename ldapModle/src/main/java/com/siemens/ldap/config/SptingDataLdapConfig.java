@@ -1,4 +1,4 @@
-package com.tz.ldap.config;
+package com.siemens.ldap.config;
 
 import com.icitic.ldap.UserDAO;
 import org.springframework.context.annotation.Bean;

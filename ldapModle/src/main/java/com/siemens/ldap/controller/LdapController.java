@@ -1,9 +1,9 @@
-package com.tz.ldap.controller;
+package com.siemens.ldap.controller;
 
-import com.tz.ldap.dao.UserRepository;
-import com.tz.ldap.pojo.LdapUsers;
-import com.tz.ldap.service.LdapService;
-import com.tz.ldap.util.ResponseMessage;
+import com.siemens.ldap.dao.UserRepository;
+import com.siemens.ldap.pojo.LdapUsers;
+import com.siemens.ldap.service.LdapService;
+import com.siemens.ldap.util.ResponseMessage;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

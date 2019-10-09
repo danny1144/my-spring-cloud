@@ -1,7 +1,7 @@
-package com.tz.ldap.config;
+package com.siemens.ldap.config;
 
 import com.icitic.ldap.exception.LDAPException;
-import com.tz.ldap.util.ResponseMessage;
+import com.siemens.ldap.util.ResponseMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;

@@ -1,4 +1,4 @@
-package com.tz.ldap.service;
+package com.siemens.ldap.service;
 
 import com.icitic.ldap.UserDAO;
 import org.springframework.beans.factory.annotation.Autowired;

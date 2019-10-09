@@ -1,4 +1,4 @@
-package com.tz.ldap.util;
+package com.siemens.ldap.util;
 
 import lombok.Data;
 

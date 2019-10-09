@@ -1,4 +1,4 @@
-package com.tz.ldap;
+package com.siemens.ldap;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

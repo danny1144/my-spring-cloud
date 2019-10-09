@@ -1,6 +1,6 @@
-package com.tz.ldap.dao;
+package com.siemens.ldap.dao;
 
-import com.tz.ldap.pojo.LdapUsers;
+import com.siemens.ldap.pojo.LdapUsers;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
