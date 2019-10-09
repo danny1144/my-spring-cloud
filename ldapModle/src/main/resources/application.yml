@@ -1,0 +1,10 @@
+server:
+  port: 8999
+ldap:
+  base: ou=users,dc=siemens,dc=com
+  host: localhost
+  port: 389
+  url: ldap://${ldap.host}:${ldap.port}
+  userDn: cn=Manager,dc=siemens,dc=com
+  password: 123456
+  referral: follow
