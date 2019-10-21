@@ -1,0 +1,45 @@
+server:
+  port: 8999
+ldap:
+  base: o=test,dc=siemens,dc=com
+  host: localhost
+  port: 389
+  url: ldap://${ldap.host}:${ldap.port}
+  userDn: cn=Manager,dc=siemens,dc=com
+  password: 123456
+  referral: follow
+  secAuth: simple
+  userFilter: objectClass=inetOrgPerson # objectClass=chd-person  用户过滤器
+  groupFilter: objectClass=groupOfNames # objectClass=chd-organization 用户组过滤器
+  userGroupSwitch: true  #同步用户组开关
+  optionalName: givenName  #displayName
+  employeeId: employeeNumber  #idCardNumber
+  loginName: uid
+  email: mail #mail
+  requiredName: sn
+  phone: telephoneNumber #mobile
+  groupObjectClass: groupOfNames
+  groupMemberName: member
+  groupMemberType: RDN
+  ldapSwitch: ON
+  userBaseDn: #用户搜索的根节点  cn=users,o=chd,c=cn
+  userGroupBaseDn: #用户组搜索的根节点 cn=orgs,o=chd,c=cn
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver  #配置JDBC Driver
+    username: sa #配置数据库用户名
+    url: jdbc:h2:mem:dbtest #配置h2数据库的连接地址
+    password: sa #配置数据库密码
+   # schema: classpath:db/schema.sql  #进行该配置后，每次启动程序，程序都会运行
+    data: classpath:db/data.sql #进行该配置后，每次启动程序，程序都会运行
+    platform: h2 #表明使用的数据库平台是h2
+  jpa:
+    hibernate:
+      ddl-auto: update #设置ddl模式
+    show-sql: true #启用SQL语句的日志记录
+  h2:
+    console: ##h2 web console设置
+      enabled: true #进行该配置，程序开启时就会启动h2 web consloe。当然这是默认的，如果你不想在启动程序时启动h2 web consloe，那么就设置为false。
+      path: /h2 #进行该配置，你就可以通过YOUR_URL/h2访问h2 web consloe。YOUR_URL是你程序的访问URl。
+      settings:
+        web-allow-others: true # 进行该配置后，h2 web consloe就可以在远程访问了。否则只能在本机访问。

@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 /**
  * 响应类
+ * @author z00403vj
  * @param <T>
  */
 @Data

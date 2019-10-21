@@ -9,7 +9,11 @@ import org.springframework.ldap.support.LdapNameBuilder;
 
 import javax.naming.Name;
 
-@Entry(base = "ou=users,dc=siemens,dc=com", objectClasses = "inetOrgPerson")
+/**
+ * ldap用户
+ * @author z00403vj
+ */
+@Entry(base = "dc=siemens,dc=com", objectClasses = "inetOrgPerson")
 @JsonIgnoreProperties(value = {"dn"})
 @Data
 @NoArgsConstructor

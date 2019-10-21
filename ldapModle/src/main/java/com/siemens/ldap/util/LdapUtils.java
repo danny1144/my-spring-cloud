@@ -1,10 +1,9 @@
 package com.siemens.ldap.util;
 
+import com.siemens.ldap.config.LDAPConf;
+import org.springframework.beans.factory.annotation.Autowired;
 import sun.misc.BASE64Encoder;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
@@ -13,41 +12,31 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.Control;
 import javax.naming.ldap.InitialLdapContext;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
+/**
+ * ldap工具类
+ * @author z00403vj
+ */
 public class LdapUtils {
 
-        private   final String ENCRYPT;
-        private   final String LDAPURL;
-        private   final String LDAP_PORT;
-        private   final String LDAP_PROVIDER;
-        private   final String hostname;
-        private   final String adminUid;
-        private   final String adminPassword;
-        private   final String secAuth;
-        private static ResourceBundle rb = ResourceBundle.getBundle("com.icitic.ldap.sys.config");
+
+        @Autowired
+        private LDAPConf ldapConf;
 
         public LdapUtils() {
-
-            LDAP_PORT = rb.getString("ldapport");
-            LDAP_PROVIDER = rb.getString("ldapprovider");
-            hostname = rb.getString("ldaphost");
-            adminUid = rb.getString("ldapuser");
-            adminPassword = rb.getString("ldapuserpass");
-            secAuth = rb.getString("secauth");
-            ENCRYPT = rb.getString("isEncrypted");
-            LDAPURL = "ldap://" + hostname + ":" + LDAP_PORT;
         }
-
         private InitialLdapContext initLDAPContext() throws NamingException {
             Hashtable env = new Hashtable();
-            env.put("java.naming.provider.url", this.LDAPURL);
-            env.put("java.naming.security.authentication",secAuth);
-            env.put("java.naming.security.principal", adminUid);
-            env.put("java.naming.security.credentials", adminPassword);
-            env.put("java.naming.factory.initial", LDAP_PROVIDER);
+            env.put("java.naming.provider.url",  ldapConf.getUrl());
+            env.put("java.naming.security.authentication",ldapConf.getSecAuth());
+            env.put("java.naming.security.principal", ldapConf.getUserDn());
+            env.put("java.naming.security.credentials", ldapConf.getPassword());
+            env.put("java.naming.factory.initial", "com.sun.jndi.ldap.LdapCtxFactory");
             return new InitialLdapContext(env, (Control[])null);
         }
-
         public String validateUser(String userId, String password) {
             Object var3 = null;
 
@@ -84,57 +73,6 @@ public class LdapUtils {
 
             return flag;
         }
-
-        public List<AppRole> queryAllRoles(String appId) {
-            DirContext ctx = null;
-            new Hashtable();
-            SearchResult searchResult = null;
-            Attribute attribute = null;
-
-            try {
-                ctx = this.initLDAPContext();
-                SearchControls searchControls = new SearchControls();
-                searchControls.setSearchScope(2);
-                NamingEnumeration results = ctx.search("cn=roles,o=chd,c=cn", "(&(objectClass=chd-role)(appid=" + appId + "))", searchControls);
-
-                ArrayList list;
-                AppRole appRole;
-                for(list = new ArrayList(); results.hasMore(); list.add(appRole)) {
-                    appRole = new AppRole();
-                    searchResult = (SearchResult)results.nextElement();
-                    attribute = searchResult.getAttributes().get("roleid");
-                    if (attribute != null) {
-                        appRole.setRoleId((String)attribute.get());
-                    }
-
-                    attribute = searchResult.getAttributes().get("rolename");
-                    if (attribute != null) {
-                        appRole.setRoleName((String)attribute.get());
-                    }
-                }
-
-                ArrayList var11 = list;
-                return var11;
-            } catch (Exception var19) {
-                var19.printStackTrace();
-            } finally {
-                if (ctx != null) {
-                    try {
-                        ctx.close();
-                    } catch (NamingException var18) {
-                        ;
-                    }
-                }
-
-                ctx = null;
-                Hashtable env = null;
-                searchResult = null;
-                attribute = null;
-            }
-
-            return null;
-        }
-
         public List<Organization> queryDeptByDeptCode(String deptID) {
             DirContext ctx = null;
             SearchResult searchResult = null;
@@ -143,7 +81,7 @@ public class LdapUtils {
                 ctx = this.initLDAPContext();
                 SearchControls searchControls = new SearchControls();
                 searchControls.setSearchScope(2);
-                NamingEnumeration results = ctx.search("cn=orgs,o=chd,c=cn", "(&(objectClass=chd-organization)(o=" + deptID + "))", searchControls);
+                NamingEnumeration results = ctx.search(ldapConf.getBase(), "(&("+ldapConf.getGroupFilter()+")(o=" + deptID + "))", searchControls);
                 ArrayList list = new ArrayList();
 
                 while(results.hasMore()) {
@@ -189,7 +127,7 @@ public class LdapUtils {
                 SearchControls searchControls = new SearchControls();
                 searchControls.setSearchScope(2);
 
-                for(NamingEnumeration results = ctx.search("cn=orgs,o=chd,c=cn", "(&(objectClass=chd-organization)(o=" + parentCode + "))", searchControls); results.hasMore(); organization = this.getOrganization(searchResult)) {
+                for(NamingEnumeration results = ctx.search(ldapConf.getBase(), "(&("+ldapConf.getGroupFilter()+")(o=" + parentCode + "))", searchControls); results.hasMore(); organization = this.getOrganization(searchResult)) {
                     searchResult = (SearchResult)results.nextElement();
                 }
             } catch (Exception var19) {
@@ -222,7 +160,7 @@ public class LdapUtils {
                 ctx = this.initLDAPContext();
                 SearchControls searchControls = new SearchControls();
                 searchControls.setSearchScope(2);
-                NamingEnumeration results = ctx.search("cn=orgs,o=chd,c=cn", "(&(objectClass=chd-organization)(parentOrgId=" + orgCode + "))", searchControls);
+                NamingEnumeration results = ctx.search(ldapConf.getBase(), "(&("+ldapConf.getGroupFilter()+")(parentOrgId=" + orgCode + "))", searchControls);
                 String o = null;
                 ArrayList list = new ArrayList();
 
@@ -271,7 +209,7 @@ public class LdapUtils {
                 ctx = this.initLDAPContext();
                 SearchControls searchControls = new SearchControls();
                 searchControls.setSearchScope(2);
-                NamingEnumeration results = ctx.search("cn=orgs,o=chd,c=cn", "(&(objectClass=chd-organization)(parentOrgId=" + orgCode + "))", searchControls);
+                NamingEnumeration results = ctx.search(ldapConf.getBase(), "(&(" +ldapConf.getGroupFilter()+")(parentOrgId=" + orgCode + "))", searchControls);
                 String o = null;
 
                 while(results.hasMore()) {
@@ -305,74 +243,122 @@ public class LdapUtils {
 
         }
 
-        public Map queryUserRole(String appId, String userName) {
-            DirContext ctx = null;
-            new Hashtable();
-            SearchResult searchResult = null;
-            Attribute attribute = null;
-            HashMap map = new HashMap();
+    public List<UserInfo> queryAllUser() {
+        DirContext ctx = null;
+        new Hashtable();
+        SearchResult searchResult = null;
+        Attribute attribute = null;
 
-            try {
-                ctx = this.initLDAPContext();
-                SearchControls searchControls = new SearchControls();
-                searchControls.setSearchScope(2);
-                NamingEnumeration results = ctx.search("cn=users,o=chd,c=cn", "(&(objectClass=chd-person)(cn=" + userName + "))", searchControls);
+        try {
+            ctx = this.initLDAPContext();
+            SearchControls searchControls = new SearchControls();
+            searchControls.setSearchScope(2);
+            NamingEnumeration results = ctx.search(ldapConf.getBase(), "(&("+ldapConf.getUserFilter()+"))", searchControls);
 
-                while(results.hasMore()) {
-                    searchResult = (SearchResult)results.nextElement();
-                    attribute = searchResult.getAttributes().get("roleids");
-                    String roleName;
-                    if (attribute != null) {
-                        for(int i = 0; i < attribute.size(); ++i) {
-                            if (i != attribute.size() - 1) {
-                                if (attribute.get(i).toString().substring(0, 4).equals(appId)) {
-                                    roleName = this.getAppRole(attribute.get(i).toString()).getRoleName();
-                                    map.put(attribute.get(i).toString(), roleName);
-                                }
-                            } else if (attribute.get(i).toString().substring(0, 4).equals(appId)) {
-                                roleName = this.getAppRole(attribute.get(i).toString()).getRoleName();
-                                map.put(attribute.get(i).toString(), roleName);
-                            }
+            ArrayList list;
+            UserInfo userInfo;
+            for(list = new ArrayList(); results.hasMore(); list.add(userInfo)) {
+                userInfo = new UserInfo();
+                searchResult = (SearchResult)results.nextElement();
+                attribute = searchResult.getAttributes().get("cn");
+                if (attribute != null) {
+                    userInfo.setCn((String)attribute.get());
+                }
+
+                attribute = searchResult.getAttributes().get("displayName");
+                if (attribute != null) {
+                    userInfo.setName((String)attribute.get());
+                }
+
+                attribute = searchResult.getAttributes().get("idCardNumber");
+                if (attribute != null) {
+                    userInfo.setCardNumber((String)attribute.get());
+                }
+
+                attribute = searchResult.getAttributes().get("o");
+                if (attribute != null) {
+                    userInfo.setO((String)attribute.get());
+                }
+
+                attribute = searchResult.getAttributes().get("mail");
+                if (attribute != null) {
+                    userInfo.setMail((String)attribute.get());
+                }
+
+                attribute = searchResult.getAttributes().get("mobile");
+                if (attribute != null) {
+                    userInfo.setMobile((String)attribute.get());
+                }
+
+                attribute = searchResult.getAttributes().get("reserve1");
+                if (attribute != null) {
+                    userInfo.setType((String)attribute.get());
+                }
+
+                attribute = searchResult.getAttributes().get("appids");
+                String appids = new String();
+                if (attribute != null) {
+                    for(int i = 0; i < attribute.size(); ++i) {
+                        if (i != attribute.size() - 1) {
+                            appids = appids + attribute.get(i).toString() + ",";
+                        } else {
+                            appids = appids + attribute.get(i).toString();
                         }
                     }
 
-                    attribute = searchResult.getAttributes().get("orgIds");
-                    String orgids = null;
-                    roleName = null;
-                    Organization o = null;
-                    if (attribute != null) {
-                        for(int i = 0; i < attribute.size(); ++i) {
-                            orgids = attribute.get(i).toString();
-                            if (orgids.substring(0, 4).equals(appId)) {
-                                roleName = this.getAppRole(orgids.substring(0, orgids.indexOf("-"))).getRoleName();
-                                o = this.queryParentOrganiz(orgids.substring(orgids.indexOf("-") + 1));
-                                map.put(orgids.substring(0, orgids.indexOf("-")), "(兼职--" + o.getOrgName() + ")" + roleName);
-                            }
+                    userInfo.setAppIds(appids);
+                }
+
+                attribute = searchResult.getAttributes().get("roleids");
+                String roleids = new String();
+                if (attribute != null) {
+                    for(int i = 0; i < attribute.size(); ++i) {
+                        if (i != attribute.size() - 1) {
+                            roleids = roleids + attribute.get(i).toString() + ",";
+                        } else {
+                            roleids = roleids + attribute.get(i).toString();
                         }
                     }
+
+                    userInfo.setRoleIds(roleids);
                 }
 
-                HashMap var15 = map;
-                return var15;
-            } catch (Exception var23) {
-                var23.printStackTrace();
-            } finally {
-                if (ctx != null) {
-                    try {
-                        ctx.close();
-                    } catch (NamingException var22) {
-                        ;
+                attribute = searchResult.getAttributes().get("orgIds");
+                String orgids = new String();
+                if (attribute != null) {
+                    for(int i = 0; i < attribute.size(); ++i) {
+                        if (i != attribute.size() - 1) {
+                            orgids = orgids + attribute.get(i).toString() + ",";
+                        } else {
+                            orgids = orgids + attribute.get(i).toString();
+                        }
                     }
-                }
 
-                ctx = null;
-                Hashtable env = null;
-                searchResult = null;
-                attribute = null;
+                    userInfo.setOrgIds(orgids);
+                }
             }
 
-            return null;
+            ArrayList var15 = list;
+            return var15;
+        } catch (Exception var23) {
+            var23.printStackTrace();
+        } finally {
+            if (ctx != null) {
+                try {
+                    ctx.close();
+                } catch (NamingException var22) {
+                    ;
+                }
+            }
+
+            ctx = null;
+            Hashtable env = null;
+            searchResult = null;
+            attribute = null;
         }
+
+        return null;
+    }
 
         public List<UserInfo> queryUserByUserID(String userID) {
             DirContext ctx = null;
@@ -384,7 +370,7 @@ public class LdapUtils {
                 ctx = this.initLDAPContext();
                 SearchControls searchControls = new SearchControls();
                 searchControls.setSearchScope(2);
-                NamingEnumeration results = ctx.search("cn=users,o=chd,c=cn", "(&(objectClass=chd-person)(cn=" + userID + "))", searchControls);
+                NamingEnumeration results = ctx.search(ldapConf.getBase(), "(&("+ldapConf.getUserFilter()+")(cn=" + userID + "))", searchControls);
 
                 ArrayList list;
                 UserInfo userInfo;
@@ -491,119 +477,11 @@ public class LdapUtils {
             return null;
         }
 
-        public List<Organization> queryUserDeptList(String userID) {
-            DirContext ctx = null;
-            new Hashtable();
-            SearchResult searchResult = null;
-            Attribute attribute = null;
-
-            try {
-                ctx = this.initLDAPContext();
-                SearchControls searchControls = new SearchControls();
-                searchControls.setSearchScope(2);
-                NamingEnumeration results = ctx.search("cn=users,o=chd,c=cn", "(&(objectClass=chd-person)(cn=" + userID + "))", searchControls);
-
-                do {
-                    if (!results.hasMore()) {
-                        return null;
-                    }
-
-                    searchResult = (SearchResult)results.nextElement();
-                    new UserInfo();
-                    attribute = searchResult.getAttributes().get("o");
-                } while(attribute == null);
-
-                List localList1 = this.queryOrganizeByID((String)attribute.get());
-                List var11 = localList1;
-                return var11;
-            } catch (Exception var20) {
-                var20.printStackTrace();
-            } finally {
-                if (ctx != null) {
-                    try {
-                        ctx.close();
-                    } catch (NamingException var19) {
-                        ;
-                    }
-                }
-
-                ctx = null;
-                Hashtable env = null;
-                searchResult = null;
-                attribute = null;
-            }
-
-            return null;
-        }
-
-        public List<Organization> queryPartTimeDeptList(String userID, String appID) {
-            DirContext ctx = null;
-            new Hashtable();
-            SearchResult searchResult = null;
-            Attribute attribute = null;
-            boolean flag = false;
-            String roleJson = "[";
-            String partime = "";
-            ArrayList orgList = new ArrayList();
-
-            try {
-                ctx = this.initLDAPContext();
-                SearchControls searchControls = new SearchControls();
-                searchControls.setSearchScope(2);
-                NamingEnumeration results = ctx.search("cn=users,o=chd,c=cn", "(&(objectClass=chd-person)(cn=" + userID + ")(orgIds=" + appID + "*))", searchControls);
-                ArrayList list = new ArrayList();
-
-                while(true) {
-                    do {
-                        if (!results.hasMore()) {
-                            if (flag && list.size() > 0) {
-                                new Organization();
-
-                                for(int j = 0; j < list.size(); ++j) {
-                                    partime = (String)list.get(j);
-                                    Organization o = this.getOrganize(partime.substring(partime.indexOf("-") + 1));
-                                    orgList.add(o);
-                                }
-                            }
-
-                            return orgList;
-                        }
-
-                        flag = true;
-                        searchResult = (SearchResult)results.nextElement();
-                        attribute = searchResult.getAttributes().get("orgIds");
-                    } while(attribute == null);
-
-                    for(int i = 0; i < attribute.size(); ++i) {
-                        if (i != attribute.size() - 1) {
-                            if (attribute.get(i).toString().indexOf(appID) >= 0) {
-                                list.add(attribute.get(i).toString());
-                            }
-                        } else if (attribute.get(i).toString().indexOf(appID) >= 0) {
-                            list.add(attribute.get(i).toString());
-                        }
-                    }
-                }
-            } catch (Exception var24) {
-                var24.printStackTrace();
-            } finally {
-                if (ctx != null) {
-                    try {
-                        ctx.close();
-                    } catch (NamingException var23) {
-                        ;
-                    }
-                }
-
-                ctx = null;
-                Hashtable env = null;
-                searchResult = null;
-                attribute = null;
-            }
-
-            return orgList;
-        }
-
+    /**
+     * 根据用户组编号获取用户集合
+     * @param orgCode
+     * @return
+     */
         public List<UserInfo> queryOrgUser(String orgCode) {
             DirContext ctx = null;
             SearchResult searchResult = null;
@@ -614,7 +492,7 @@ public class LdapUtils {
                 ctx = this.initLDAPContext();
                 SearchControls searchControls = new SearchControls();
                 searchControls.setSearchScope(2);
-                NamingEnumeration results = ctx.search("cn=users,o=chd,c=cn", "(&(objectClass=chd-person)" + o + ")", searchControls);
+                NamingEnumeration results = ctx.search(ldapConf.getBase(), "(&("+ldapConf.getUserFilter()+")" + o + ")", searchControls);
 
                 ArrayList list;
                 UserInfo userInfo;
@@ -719,6 +597,61 @@ public class LdapUtils {
 
             return null;
         }
+
+    /**
+     * 获取用户对应的用户组
+     * @param userID
+     * @return
+     */
+    public List<LdapUtils.Organization> queryUserDeptList(String userID) {
+        List<Organization> result = null;
+        boolean finished = false;
+        DirContext ctx = null;
+        new Hashtable();
+        SearchResult searchResult = null;
+        Attribute attribute = null;
+
+        try {
+            ctx = this.initLDAPContext();
+            SearchControls searchControls = new SearchControls();
+            searchControls.setSearchScope(2);
+            NamingEnumeration results = ctx.search(ldapConf.getBase(), "(&("+ldapConf.getUserFilter()+")(cn=" + userID + "))", searchControls);
+
+            do {
+                if (!results.hasMore()) {
+                    finished = true;
+                    break;
+                }
+
+                searchResult = (SearchResult) results.nextElement();
+                new UserInfo();
+                attribute = searchResult.getAttributes().get("o");
+            } while (attribute == null);
+            if (!finished) {
+
+                List localList1 = this.queryOrganizeByID((String) attribute.get());
+                List var11 = localList1;
+                result = var11;
+            }
+        } catch (Exception var20) {
+            var20.printStackTrace();
+        } finally {
+            if (ctx != null) {
+                try {
+                    ctx.close();
+                } catch (NamingException var19) {
+                    ;
+                }
+            }
+
+            ctx = null;
+            Hashtable env = null;
+            searchResult = null;
+            attribute = null;
+        }
+
+        return result;
+    }
 
         public List<UserInfo> queryAppUser(String appId) {
             DirContext ctx = null;
@@ -730,7 +663,7 @@ public class LdapUtils {
                 ctx = this.initLDAPContext();
                 SearchControls searchControls = new SearchControls();
                 searchControls.setSearchScope(2);
-                NamingEnumeration results = ctx.search("cn=users,o=chd,c=cn", "(&(objectClass=chd-person)(|(appIds=" + appId + ")(orgIds=" + appId + "*)))", searchControls);
+                NamingEnumeration results = ctx.search(ldapConf.getBase(), "(&("+ldapConf.getUserFilter()+")(|(appIds=" + appId + ")(orgIds=" + appId + "*)))", searchControls);
 
                 ArrayList list;
                 UserInfo userInfo;
@@ -837,6 +770,10 @@ public class LdapUtils {
             return null;
         }
 
+    /**
+     * 获取所有用户组
+     * @return
+     */
         public List<Organization> queryAllDepartments() {
             DirContext ctx = null;
             new Hashtable();
@@ -846,7 +783,7 @@ public class LdapUtils {
                 ctx = this.initLDAPContext();
                 SearchControls searchControls = new SearchControls();
                 searchControls.setSearchScope(2);
-                NamingEnumeration results = ctx.search("cn=orgs,o=chd,c=cn", "objectClass=chd-organization", searchControls);
+                NamingEnumeration results = ctx.search(ldapConf.getBase(), ldapConf.getGroupFilter(), searchControls);
                 ArrayList list = new ArrayList();
 
                 while(results.hasMore()) {
@@ -883,7 +820,7 @@ public class LdapUtils {
                 ctx = this.initLDAPContext();
                 SearchControls searchControls = new SearchControls();
                 searchControls.setSearchScope(2);
-                NamingEnumeration results = ctx.search("cn=orgs,o=chd,c=cn", "(&(objectClass=chd-organization)(o=" + orgCode + "))", searchControls);
+                NamingEnumeration results = ctx.search(ldapConf.getBase(), "(&("+ldapConf.getGroupFilter()+")(o=" + orgCode + "))", searchControls);
                 ArrayList list = new ArrayList();
 
                 while(results.hasMore()) {
@@ -922,7 +859,7 @@ public class LdapUtils {
                 ctx = this.initLDAPContext();
                 SearchControls searchControls = new SearchControls();
                 searchControls.setSearchScope(2);
-                NamingEnumeration results = ctx.search("cn=users,o=chd,c=cn", "(&(objectClass=chd-person)(cn=" + userId + "))", searchControls);
+                NamingEnumeration results = ctx.search(ldapConf.getBase(), "(&("+ldapConf.getUserFilter()+")(cn=" + userId + "))", searchControls);
                 if (results.hasMoreElements()) {
                     searchResult = (SearchResult)results.nextElement();
                     userInfo = new UserInfo();
@@ -1025,59 +962,6 @@ public class LdapUtils {
             return userInfo;
         }
 
-        private AppRole getAppRole(String roleId) {
-            AppRole appRole = null;
-            DirContext ctx = null;
-            new Hashtable();
-            SearchResult searchResult = null;
-            Attribute attribute = null;
-
-            try {
-                ctx = this.initLDAPContext();
-                SearchControls searchControls = new SearchControls();
-                searchControls.setSearchScope(2);
-                NamingEnumeration results = ctx.search("cn=roles,o=chd,c=cn", "(&(objectClass=chd-role)(roleid=" + roleId + "))", searchControls);
-                if (results.hasMoreElements()) {
-                    searchResult = (SearchResult)results.nextElement();
-                    appRole = new AppRole();
-                    attribute = searchResult.getAttributes().get("roleid");
-                    if (attribute != null) {
-                        appRole.setRoleId((String)attribute.get());
-                    }
-
-                    attribute = searchResult.getAttributes().get("rolename");
-                    if (attribute != null) {
-                        appRole.setRoleName((String)attribute.get());
-                    }
-
-                    attribute = searchResult.getAttributes().get("appid");
-                    if (attribute != null) {
-                        appRole.setAppId((String)attribute.get());
-                    }
-                }
-
-                AppRole var11 = appRole;
-                return var11;
-            } catch (Exception var19) {
-                var19.printStackTrace();
-            } finally {
-                if (ctx != null) {
-                    try {
-                        ctx.close();
-                    } catch (NamingException var18) {
-                        ;
-                    }
-                }
-
-                ctx = null;
-                Hashtable env = null;
-                searchResult = null;
-                attribute = null;
-            }
-
-            return null;
-        }
-
         private String queryOs(String orgCode) {
             StringBuffer orgBuffer = new StringBuffer();
             orgBuffer.append("(|(o=");
@@ -1092,7 +976,7 @@ public class LdapUtils {
                 ctx = this.initLDAPContext();
                 SearchControls searchControls = new SearchControls();
                 searchControls.setSearchScope(2);
-                NamingEnumeration results = ctx.search("cn=orgs,o=chd,c=cn", "(&(objectClass=chd-organization)(parentOrgId=" + orgCode + "))", searchControls);
+                NamingEnumeration results = ctx.search(ldapConf.getBase(), "(&("+ldapConf.getGroupFilter()+")(parentOrgId=" + orgCode + "))", searchControls);
                 String o = null;
                 new ArrayList();
 
@@ -1143,7 +1027,7 @@ public class LdapUtils {
                 ctx = this.initLDAPContext();
                 SearchControls searchControls = new SearchControls();
                 searchControls.setSearchScope(2);
-                NamingEnumeration results = ctx.search("cn=orgs,o=chd,c=cn", "(&(objectClass=chd-organization)(parentOrgId=" + orgCode + "))", searchControls);
+                NamingEnumeration results = ctx.search(ldapConf.getBase(), "(&("+ldapConf.getGroupFilter()+")(parentOrgId=" + orgCode + "))", searchControls);
                 String o = null;
 
                 while(results.hasMore()) {
@@ -1176,7 +1060,6 @@ public class LdapUtils {
             }
 
         }
-
         private Organization getOrganize(String deptID) {
             DirContext ctx = null;
             Organization organization = null;
@@ -1187,7 +1070,7 @@ public class LdapUtils {
                 SearchControls searchControls = new SearchControls();
                 searchControls.setSearchScope(2);
 
-                for(NamingEnumeration results = ctx.search("cn=orgs,o=chd,c=cn", "(&(objectClass=chd-organization)(o=" + deptID + "))", searchControls); results.hasMore(); organization = this.getOrganization(searchResult)) {
+                for(NamingEnumeration results = ctx.search(ldapConf.getBase(), "(&("+ldapConf.getGroupFilter()+")(o=" + deptID + "))", searchControls); results.hasMore(); organization = this.getOrganization(searchResult)) {
                     searchResult = (SearchResult)results.nextElement();
                 }
             } catch (Exception var15) {
@@ -1253,40 +1136,6 @@ public class LdapUtils {
 
             return organization;
         }
-
-        public class AppRole {
-            private String roleId;
-            private String roleName;
-            private String appId;
-
-            public AppRole() {
-            }
-
-            public String getRoleId() {
-                return this.roleId;
-            }
-
-            public void setRoleId(String roleId) {
-                this.roleId = roleId;
-            }
-
-            public String getRoleName() {
-                return this.roleName;
-            }
-
-            public void setRoleName(String roleName) {
-                this.roleName = roleName;
-            }
-
-            public String getAppId() {
-                return this.appId;
-            }
-
-            public void setAppId(String appId) {
-                this.appId = appId;
-            }
-        }
-
         public class Organization {
             private String orgId;
             private String orgName;
