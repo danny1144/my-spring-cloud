@@ -16,4 +16,19 @@
 
 每个消息可以有多个消费者并且生产者和消费者之间有时间上的相关性，订阅一个主题的消费者只能消费自它订阅之后
 发布的消息。
-  
+
+ **ActiveMQ的原理是什么？**
+
+1、首先需要创建连接工厂（ConnectionFactory ），用于连接ActiveMQ的服务端
+2、其中ConnectionFactory 又有两个子类分别是队列连接工厂（QueueConnectionFactory）
+和主题连接工厂（TopicConnectionFactory）
+3、发送消息的时候具体使用哪个连接工厂是由消息发送的目的地（Destination）来决定的，
+Destination是消息生产者的消息发送目标或者说消息消费者的消息来源
+4、对于消息生产者来说，它的Destination是某个队列（Queue）或某个主题（Topic），
+对于消息消费者来说，它的Destination也是某个队列或主题（即消息来源）
+5、然后在确定了使用哪种连接工厂后，就通过该连接工厂创建出连接对象（Connection），
+该连接对象是对TCP/IP socket的包装。连接对象可以产生多个会话（session），通过会话来发送消息（Message），
+这就是我们发送和接受的消息。
+
+
+
