@@ -15,6 +15,7 @@
         <module>thread</module>
         <module>actuator</module>
         <module>ldapModle</module>
+        <module>messageProvider</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
