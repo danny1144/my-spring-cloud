@@ -2,6 +2,7 @@ package com.tz.mq.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsMessagingTemplate;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,18 +21,20 @@ public class ProviderController {
     @Autowired
     private Queue queue;
 
-    //注入springboot封装的工具类
+    /**
+     * 注入springboot封装的工具类
+     */
     @Autowired
-    private JmsMessagingTemplate jmsMessagingTemplate;
+    private JmsTemplate jmsTemplate;
     @Autowired
     private Topic topic;
 
     @RequestMapping("send")
     public String send(String name) {
         //方法一：添加消息到消息队列
-        jmsMessagingTemplate.convertAndSend(queue, name);
+        jmsTemplate.convertAndSend(queue, name);
         //方法二：发布topic消息
-        jmsMessagingTemplate.convertAndSend(topic, name);
+        jmsTemplate.convertAndSend(topic, name);
         return "success";
     }
 }
